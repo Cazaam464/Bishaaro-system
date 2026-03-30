@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="so">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Nidaamka Maaraynta Bishaaro</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <style>
+    [x-cloak] { display: none !important; }
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+    .nav-tab.active { background-color: #16a34a; color: #fff; }
+    .nav-tab { transition: all 0.2s ease; }
+    .fade-in { animation: fadeIn 0.3s ease-in; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+    .toast { animation: slideIn 0.3s ease, fadeOut 0.4s ease 2.6s forwards; }
+    @keyframes slideIn { from { transform: translateX(110%); } to { transform: translateX(0); } }
+    @keyframes fadeOut { from { opacity: 1; } to { opacity: 0; pointer-events: none; } }
+    ::-webkit-scrollbar { width: 6px; } 
+    ::-webkit-scrollbar-track { background: #f1f5f9; }
+    ::-webkit-scrollbar-thumb { background: #16a34a; border-radius: 4px; }
+    .sidebar-link.active { background-color: #dcfce7; color: #16a34a; border-left: 4px solid #16a34a; }
+    @media (max-width: 768px) { .sidebar { transform: translateX(-100%); transition: transform 0.3s; position: fixed; z-index: 50; height: 100%; }
+      .sidebar.open { transform: translateX(0); } }
+  </style>
+</head>
+<body class="bg-gray-50 min-h-screen font-sans">
+
+  <!-- Toast Notification -->
+  <div id="toast-container" class="fixed top-5 right-5 z-50 flex flex-col gap-2 w-80"></div>
+
+  <!-- Overlay for mobile sidebar -->
+  <div id="sidebar-overlay" class="hidden fixed inset-0 bg-black bg-opacity-40 z-40 md:hidden" onclick="closeSidebar()"></div>
+
+  <!-- Layout wrapper -->
+  <div class="flex min-h-screen">
+
+    <!-- Sidebar -->
+    <aside id="sidebar" class="sidebar bg-white w-64 shadow-lg flex flex-col">
+      <!-- Logo -->
+      <div class="flex items-center gap-3 px-6 py-5 border-b border-gray-100">
+        <div class="bg-green-600 text-white rounded-xl p-2">
+          <i class="fa-solid fa-leaf text-xl"></i>
+        </div>
+        <div>
+          <h1 class="font-bold text-gray-800 text-lg leading-tight">Bishaaro</h1>
+          <p class="text-xs text-gray-400">Nidaamka Maaraynta</p>
+        </div>
+      </div>
+
+      <!-- Nav Links -->
+      <nav class="flex-1 px-4 py-6 space-y-1">
+        <button class="sidebar-link active nav-tab w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium text-gray-700 hover:bg-green-50" onclick="switchTab('dashboard')">
+          <i class="fa-solid fa-gauge-high w-5 text-center"></i> Xog-guud
+        </button>
+        <button class="sidebar-link nav-tab w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium text-gray-700 hover:bg-green-50" onclick="switchTab('vegetables')">
+          <i class="fa-solid fa-carrot w-5 text-center"></i> Khudradda
+        </button>
+        <button class="sidebar-link nav-tab w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium text-gray-700 hover:bg-green-50" onclick="switchTab('customers')">
+          <i class="fa-solid fa-users w-5 text-center"></i> Macaamiisha
+        </button>
+        <button class="sidebar-link nav-tab w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium text-gray-700 hover:bg-green-50" onclick="switchTab('orders')">
+          <i class="fa-solid fa-cart-shopping w-5 text-center"></i> Dalabka
+        </button>
+      </nav>
+
+      <!-- Footer -->
+      <div class="px-6 py-4 border-t border-gray-100 text-xs text-gray-400 text-center">
+        &copy; 2024 Nidaamka Bishaaro
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <div class="flex-1 flex flex-col min-w-0">
+
+      <!-- Top Bar -->
+      <header class="bg-white shadow-sm px-4 sm:px-6 py-4 flex items-center justify-between sticky top-0 z-30">
+        <div class="flex items-center gap-3">
+          <button class="md:hidden text-gray-500 hover:text-green-600" onclick="toggleSidebar()">
+            <i class="fa-solid fa-bars text-xl"></i>
+          </button>
+          <h2 id="page-title" class="text-lg font-semibold text-gray-700">Xog-guud</h2>
+        </div>
+        <div class="flex items-center gap-3">
+          <span class="hidden sm:flex items-center gap-2 text-sm text-gray-500">
+            <i class="fa-solid fa-circle text-green-500 text-xs"></i> Toos
+          </span>
+          <div class="w-9 h-9 rounded-full bg-green-100 flex items-center justify-center text-green-700 font-bold text-sm">B</div>
+        </div>
+      </header>
+
+      <!-- Page Content -->
+      <main class="flex-1 p-4 sm:p-6 overflow-auto">
+
+        <!-- ===== DASHBOARD TAB ===== -->
+        <section id="tab-dashboard" class="tab-content active fade-in">
+          <div class="mb-6">
+            <h3 class="text-2xl font-bold text-gray-800">Ku soo dhowow!</h3>
+            <p class="text-gray-500 text-sm mt-1">Waa kidan tahay ganacsigaaga maanta.</p>
+          </div>
+
+          <!-- Stats Cards -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+            <div class="bg-white rounded-2xl shadow-sm p-5 flex items-center gap-4 border border-gray-100">
+              <div class="bg-green-100 text-green-600 rounded-xl p-3 text-xl"><i class="fa-solid fa-carrot"></i></div>
+              <div>
+                <p class="text-xs text-gray-400 uppercase tracking-wide">Khudradda</p>
+                <p id="stat-vegetables" class="text-2xl font-bold text-gray-800">0</p>
+              </div>
+            </div>
+            <div class="bg-white rounded-2xl shadow-sm p-5 flex items-center gap-4 border border-gray-100">
+              <div class="bg-blue-100 text-blue-600 rounded-xl p-3 text-xl"><i class="fa-solid fa-users"></i></div>
+              <div>
+                <p class="text-xs text-gray-400 uppercase tracking-wide">Macaamiisha</p>
+                <p id="stat-customers" class="text-2xl font-bold text-gray-800">0</p>
+              </div>
+            </div>
+            <div class="bg-white rounded-2xl shadow-sm p-5 flex items-center gap-4 border border-gray-100">
+              <div class="bg-purple-100 text-purple-600 rounded-xl p-3 text-xl"><i class="fa-solid fa-cart-shopping"></i></div>
+              <div>
+                <p class="text-xs text-gray-400 uppercase tracking-wide">Dalabka</p>
+                <p id="stat-orders" class="text-2xl font-bold text-gray-800">0</p>
+              </div>
+            </div>
+            <div class="bg-white rounded-2xl shadow-sm p-5 flex items-center gap-4 border border-gray-100">
+              <div class="bg-yellow-100 text-yellow-600 rounded-xl p-3 text-xl"><i class="fa-solid fa-dollar-sign"></i></div>
+              <div>
+                <p class="text-xs text-gray-400 uppercase tracking-wide">Dakhliga</p>
+                <p id="stat-revenue" class="text-2xl font-bold text-gray-800">$0</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Recent Orders Table -->
+          <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+            <div class="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
+              <h4 class="font-semibold text-gray-700">Dalabada Dambe</h4>
+              <button onclick="switchTab('orders')" class="text-green-600 text-sm hover:underline">Dhammaan arag</button>
+            </div>
+            <div class="overflow-x-auto">
+              <table class="w-full text-sm">
+                <thead class="bg-gray-50 text-gray-500 uppercase text-xs">
+                  <tr>
+                    <th class="px-6 py-3 text-left">Macmiilka</th>
+                    <th class="px-6 py-3 text-left">Alaabada</th>
+                    <th class="px-6 py-3 text-left">Wadarta</th>
+                    <th class="px-6 py-3 text-left">Taariikhda</th>
+                  </tr>
+                </thead>
+                <tbody id="dashboard-recent-orders" class="divide-y divide-gray-50">
+                  <tr><td colspan="4" class="px-6 py-8 text-center text-gray-400">Dalabo ma jiraan weli</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- ===== VEGETABLES TAB ===== -->
+        <section id="tab-vegetables" class="tab-content fade-in">
+          <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
+            <div>
+              <h3 class="text-2xl font-bold text-gray-800">Khudradda</h3>
+              <p class="text-gray-500 text-sm mt-1">Maamul khudradda aad haysatid</p>
+            </div>
+            <button onclick="openVegModal()" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-xl text-sm font-medium flex items-center gap-2 transition">
+              <i class="fa-solid fa-plus"></i> Ku dar Khudrad
+            </button>
+          </div>
+
+          <!-- Search -->
+          <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 mb-4">
+            <div class="relative">
+              <i class="fa-solid fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm"></i>
+              <input id="veg-search" type="text" placeholder="Raadi khudrad..." class="w-full pl-9 pr-4 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-300" oninput="filterVegetables()" />
+            </div>
+          </div>
+
+          <!-- Table -->
+          <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+            <div class="overflow-x-auto">
+              <table class="w-full text-sm">
+                <thead class="bg-gray-50 text-gray-500 uppercase text-xs">
+                  <tr>
+                    <th class="px-6 py-3 text-left">Sawir</th>
+                    <th class="px-6 py-3 text-left">Magac</th>
+                    <th class="px-6 py-3 text-left">Qiimaha</th>
+                    <th class="px-6 py-3 text-left">Ficilada</th>
+                  </tr>
+                </thead>
+                <tbody id="veg-table-body" class="divide-y divide-gray-50">
+                  <tr><td colspan="4" class="px-6 py-8 text-center text-gray-400">Khudrad lama darin weli</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- ===== CUSTOMERS TAB ===== -->
+        <section id="tab-customers" class="tab-content fade-in">
+          <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
+            <div>
+              <h3 class="text-2xl font-bold text-gray-800">Macaamiisha</h3>
+              <p class="text-gray-500 text-sm mt-1">Maamul diiwaanka macaamiishaada</p>
+            </div>
+            <button onclick="openCustModal()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-xl text-sm font-medium flex items-center gap-2 transition">
+              <i class="fa-solid fa-plus"></i> Ku dar Macmiil
+            </button>
+          </div>
+
+          <!-- Search -->
+          <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 mb-4">
+            <div class="relative">
+              <i class="fa-solid fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm"></i>
+              <input id="cust-search" type="text" placeholder="Raadi macmiil..." class="w-full pl-9 pr-4 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-300" oninput="filterCustomers()" />
+            </div>
+          </div>
+
+          <!-- Table -->
+          <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+            <div class="overflow-x-auto">
+              <table class="w-full text-sm">
+                <thead class="bg-gray-50 text-gray-500 uppercase text-xs">
+                  <tr>
+                    <th class="px-6 py-3 text-left">Magac</th>
+                    <th class="px-6 py-3 text-left">Telefoon</th>
+                    <th class="px-6 py-3 text-left">Ciwaanka</th>
+                    <th class="px-6 py-3 text-left">Ficilada</th>
+                  </tr>
+                </thead>
+                <tbody id="cust-table-body" class="divide-y divide-gray-50">
+                  <tr><td colspan="4" class="px-6 py-8 text-center text-gray-400">Macaamiil lama diiwaangelinin weli</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- ===== ORDERS TAB ===== -->
+        <section id="tab-orders" class="tab-content fade-in">
+          <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
+            <div>
+              <h3 class="text-2xl font-bold text-gray-800">Dalabka</h3>
+              <p class="text-gray-500 text-sm mt-1">Maamul dalabada macaamiisha</p>
+            </div>
+            <button onclick="openOrderModal()" class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-xl text-sm font-medium flex items-center gap-2 transition">
+              <i class="fa-solid fa-plus"></i> Dalab Cusub
+            </button>
+          </div>
+
+          <!-- Table -->
+          <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+            <div class="overflow-x-auto">
+              <table class="w-full text-sm">
+                <thead class="bg-gray-50 text-gray-500 uppercase text-xs">
+                  <tr>
+                    <th class="px-6 py-3 text-left">#</th>
+                    <th class="px-6 py-3 text-left">Macmiilka</th>
+                    <th class="px-6 py-3 text-left">Alaabada</th>
+                    <th class="px-6 py-3 text-left">Wadarta</th>
+                    <th class="px-6 py-3 text-left">La bixiyay</th>
+                    <th class="px-6 py-3 text-left">Haraaga</th>
+                    <th class="px-6 py-3 text-left">Taariikhda</th>
+                    <th class="px-6 py-3 text-left">Ficilada</th>
+                  </tr>
+                </thead>
+                <tbody id="orders-table-body" class="divide-y divide-gray-50">
+                  <tr><td colspan="8" class="px-6 py-8 text-center text-gray-400">Dalabo ma jiraan weli</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+      </main>
+    </div>
+  </div>
+
+  <!-- ===== VEGETABLE MODAL ===== -->
+  <div id="veg-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4">
+    <div class="absolute inset-0 bg-black bg-opacity-50" onclick="closeVegModal()"></div>
+    <div class="relative bg-white rounded-2xl shadow-2xl w-full max-w-md p-6 fade-in">
+      <div class="flex items-center justify-between mb-5">
+        <h3 id="veg-modal-title" class="text-lg font-bold text-gray-800">Ku dar Khudrad</h3>
+        <button onclick="closeVegModal()" class="text-gray-400 hover:text-gray-600"><i class="fa-solid fa-xmark text-xl"></i></button>
+      </div>
+      <form id="veg-form" onsubmit="submitVeg(event)" class="space-y-4">
+        <input type="hidden" id="veg-id" />
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Magaca Khudradda *</label>
+          <input id="veg-name" type="text" required placeholder="Tusaale: Yaanyo" class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-300" />
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Qiimaha (kg) *</label>
+          <div class="relative">
+            <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm">$</span>
+            <input id="veg-price" type="number" step="0.01" min="0" required placeholder="0.00" class="w-full border border-gray-200 rounded-lg pl-7 pr-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-300" />
+          </div>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Sawir</label>
+          <div class="space-y-2">
+            <input id="veg-image-url" type="url" placeholder="Geli URL-ka sawirka (ikhtiyaari)" class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-300" />
+            <div class="flex items-center gap-2 text-xs text-gray-400"><div class="flex-1 h-px bg-gray-200"></div>ama soo rar<div class="flex-1 h-px bg-gray-200"></div></div>
+            <input id="veg-image-file" type="file" accept="image/*" class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none" onchange="previewVegImage(event)" />
+            <img id="veg-image-preview" src="" alt="Preview" class="hidden w-full h-32 object-cover rounded-lg border border-gray-200" />
+          </div>
+        </div>
+        <div class="flex gap-3 pt-2">
+          <button type="button" onclick="closeVegModal()" class="flex-1 border border-gray-200 text-gray-600 rounded-xl py-2 text-sm font-medium hover:bg-gray-50 transition">Jooji</button>
+          <button type="submit" class="flex-1 bg-green-600 hover:bg-green-700 text-white rounded-xl py-2 text-sm font-medium transition">Kaydi</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ===== CUSTOMER MODAL ===== -->
+  <div id="cust-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4">
+    <div class="absolute inset-0 bg-black bg-opacity-50" onclick="closeCustModal()"></div>
+    <div class="relative bg-white rounded-2xl shadow-2xl w-full max-w-md p-6 fade-in">
+      <div class="flex items-center justify-between mb-5">
+        <h3 id="cust-modal-title" class="text-lg font-bold text-gray-800">Ku dar Macmiil</h3>
+        <button onclick="closeCustModal()" class="text-gray-400 hover:text-gray-600"><i class="fa-solid fa-xmark text-xl"></i></button>
+      </div>
+      <form id="cust-form" onsubmit="submitCust(event)" class="space-y-4">
+        <input type="hidden" id="cust-id" />
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Magaca Buuxa *</label>
+          <input id="cust-name" type="text" required placeholder="Tusaale: Maxamed Cali" class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-300" />
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Lambarka Telefoonka *</label>
+          <input id="cust-phone" type="tel" required placeholder="e.g. +252 61 234 5678" class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-300" />
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Ciwaanka *</label>
+          <textarea id="cust-address" required rows="2" placeholder="Tusaale: Muqdisho, Degmada Hodan" class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-300 resize-none"></textarea>
+        </div>
+        <div class="flex gap-3 pt-2">
+          <button type="button" onclick="closeCustModal()" class="flex-1 border border-gray-200 text-gray-600 rounded-xl py-2 text-sm font-medium hover:bg-gray-50 transition">Jooji</button>
+          <button type="submit" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white rounded-xl py-2 text-sm font-medium transition">Kaydi</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ===== ORDER MODAL ===== -->
+  <div id="order-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4">
+    <div class="absolute inset-0 bg-black bg-opacity-50" onclick="closeOrderModal()"></div>
+    <div class="relative bg-white rounded-2xl shadow-2xl w-full max-w-lg p-6 fade-in max-h-[90vh] overflow-y-auto">
+      <div class="flex items-center justify-between mb-5">
+        <h3 class="text-lg font-bold text-gray-800">Dalab Cusub</h3>
+        <button onclick="closeOrderModal()" class="text-gray-400 hover:text-gray-600"><i class="fa-solid fa-xmark text-xl"></i></button>
+      </div>
+      <form id="order-form" onsubmit="submitOrder(event)" class="space-y-4">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Macmiilka *</label>
+          <select id="order-customer" required class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-purple-300">
+            <option value="">Dooro macmiil...</option>
+          </select>
+        </div>
+
+        <!-- Order Items -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">Alaabada Dalabka *</label>
+          <div id="order-items-container" class="space-y-2">
+            <!-- Items added dynamically -->
+          </div>
+          <button type="button" onclick="addOrderItem()" class="mt-2 w-full border border-dashed border-gray-300 text-gray-500 hover:border-purple-400 hover:text-purple-600 rounded-lg py-2 text-sm transition flex items-center justify-center gap-2">
+            <i class="fa-solid fa-plus text-xs"></i> Ku dar alaab
+          </button>
+        </div>
+
+        <!-- Total & Payment -->
+        <div class="bg-gray-50 rounded-xl p-4 space-y-3">
+          <div class="flex justify-between items-center">
+            <span class="text-sm font-medium text-gray-600">Qiimaha Guud</span>
+            <span id="order-total-display" class="text-xl font-bold text-green-600">$0.00</span>
+          </div>
+          <div class="border-t border-gray-200 pt-3">
+            <label class="block text-sm font-medium text-gray-700 mb-2">Lacag Bilowga (Ikhtiyaari)</label>
+            <div class="relative">
+              <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm">$</span>
+              <input id="order-initial-payment" type="number" step="0.01" min="0" placeholder="0.00" class="w-full border border-gray-200 rounded-lg pl-7 pr-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-purple-300" oninput="updateOrderPaymentPreview()" />
+            </div>
+            <div id="order-payment-preview" class="hidden mt-2 text-xs text-gray-500">
+              Haraaga: <span id="order-remaining-preview" class="font-semibold text-orange-600">$0.00</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="flex gap-3 pt-2">
+          <button type="button" onclick="closeOrderModal()" class="flex-1 border border-gray-200 text-gray-600 rounded-xl py-2 text-sm font-medium hover:bg-gray-50 transition">Jooji</button>
+          <button type="submit" class="flex-1 bg-purple-600 hover:bg-purple-700 text-white rounded-xl py-2 text-sm font-medium transition">Dir Dalabka</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ===== PAYMENT MODAL ===== -->
+  <div id="payment-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4">
+    <div class="absolute inset-0 bg-black bg-opacity-50" onclick="closePaymentModal()"></div>
+    <div class="relative bg-white rounded-2xl shadow-2xl w-full max-w-md p-6 fade-in">
+      <div class="flex items-center justify-between mb-5">
+        <h3 class="text-lg font-bold text-gray-800">Ku dar Lacag</h3>
+        <button onclick="closePaymentModal()" class="text-gray-400 hover:text-gray-600"><i class="fa-solid fa-xmark text-xl"></i></button>
+      </div>
+      
+      <!-- Order Summary -->
+      <div class="bg-gray-50 rounded-xl p-4 mb-4 space-y-2">
+        <div class="flex justify-between text-sm">
+          <span class="text-gray-500">Macmiilka:</span>
+          <span id="payment-customer-name" class="font-medium text-gray-800">—</span>
+        </div>
+        <div class="flex justify-between text-sm">
+          <span class="text-gray-500">Wadarta:</span>
+          <span id="payment-total" class="font-bold text-green-600">$0.00</span>
+        </div>
+        <div class="flex justify-between text-sm">
+          <span class="text-gray-500">La bixiyay:</span>
+          <span id="payment-paid" class="font-medium text-blue-600">$0.00</span>
+        </div>
+        <div class="border-t border-gray-200 pt-2 flex justify-between">
+          <span class="text-sm font-medium text-gray-700">Haraaga:</span>
+          <span id="payment-remaining" class="font-bold text-orange-600">$0.00</span>
+        </div>
+      </div>
+
+      <!-- Payment Form -->
+      <form id="payment-form" onsubmit="submitPayment(event)" class="space-y-4">
+        <input type="hidden" id="payment-order-id" />
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Xaddiga Lacagta *</label>
+          <div class="relative">
+            <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm">$</span>
+            <input id="payment-amount" type="number" step="0.01" min="0.01" required placeholder="0.00" class="w-full border border-gray-200 rounded-lg pl-7 pr-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-300" oninput="previewPaymentRemaining()" />
+          </div>
+          <p id="payment-new-remaining" class="mt-1 text-xs text-gray-500"></p>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Xusuusin (Ikhtiyaari)</label>
+          <textarea id="payment-note" rows="2" placeholder="Tusaale: Lacag caddaan ah" class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-300 resize-none"></textarea>
+        </div>
+        <div class="flex gap-3 pt-2">
+          <button type="button" onclick="closePaymentModal()" class="flex-1 border border-gray-200 text-gray-600 rounded-xl py-2 text-sm font-medium hover:bg-gray-50 transition">Jooji</button>
+          <button type="submit" class="flex-1 bg-green-600 hover:bg-green-700 text-white rounded-xl py-2 text-sm font-medium transition">Ku dar Lacag</button>
+        </div>
+      </form>
+
+      <!-- Payment History -->
+      <div id="payment-history-section" class="mt-6 pt-4 border-t border-gray-100">
+        <h4 class="text-sm font-semibold text-gray-700 mb-3">Taariikhda Lacag-bixinta</h4>
+        <div id="payment-history-list" class="space-y-2 max-h-40 overflow-y-auto">
+          <p class="text-xs text-gray-400 text-center py-2">Lacag lama bixin weli</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== DELETE CONFIRM MODAL ===== -->
+  <div id="delete-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4">
+    <div class="absolute inset-0 bg-black bg-opacity-50" onclick="closeDeleteModal()"></div>
+    <div class="relative bg-white rounded-2xl shadow-2xl w-full max-w-sm p-6 fade-in text-center">
+      <div class="bg-red-100 text-red-500 rounded-full w-14 h-14 flex items-center justify-center mx-auto mb-4 text-2xl">
+        <i class="fa-solid fa-triangle-exclamation"></i>
+      </div>
+      <h3 class="text-lg font-bold text-gray-800 mb-2">Xaqiiji Tirtirka</h3>
+      <p class="text-gray-500 text-sm mb-6">Ma hubtaa inaad tirtirto xogtan? Ficilkan lama beddeli karo.</p>
+      <div class="flex gap-3">
+        <button onclick="closeDeleteModal()" class="flex-1 border border-gray-200 text-gray-600 rounded-xl py-2 text-sm font-medium hover:bg-gray-50 transition">Jooji</button>
+        <button id="delete-confirm-btn" class="flex-1 bg-red-500 hover:bg-red-600 text-white rounded-xl py-2 text-sm font-medium transition">Tirtir</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main App Script -->
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>
